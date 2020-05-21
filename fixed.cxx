@@ -1,6 +1,19 @@
 #include <sstream>
 #include <iostream>
 #include <limits>
+#include <stack>
+
+std::ostream& operator<< (std::ostream& os, __int128 x)
+{
+    std::ostringstream ost;
+    if (x < 0) { ost << '-'; x = -x; }
+    std::stack<char> s;
+    while (x >= 10) { s.push(x % 10); x /= 10; }
+    if (x % 10) s.push(x % 10);
+    while (not s.empty()) { ost << static_cast<char>('0' + s.top()); s.pop(); }
+    os << ost.str();
+    return os;
+}
 
 template<const unsigned P, typename int_t = int64_t>
 class Fixed
@@ -204,6 +217,50 @@ std::ostream& operator<< (std::ostream& os, const Fixed<P, IT>& f)
 int main()
 {
 {
+    Fixed<3, __int128> foo(300);
+    Fixed<3, __int128> bar(0);
+
+    std::cout << "====================================================" << std::endl;
+    *reinterpret_cast<__int128*>(&bar) = -5555;
+    std::cout << foo << '/' << bar << std::endl;
+    foo /= bar;
+    std::cout << foo << std::endl;
+
+    std::cout << "====================================================" << std::endl;
+    *reinterpret_cast<__int128*>(&bar) = 90;
+    std::cout << foo << '/' << bar << std::endl;
+    foo /= bar;
+    std::cout << foo << std::endl;
+
+    std::cout << "====================================================" << std::endl;
+    *reinterpret_cast<__int128*>(&bar) = -1;
+    std::cout << foo << '/' << bar << std::endl;
+    foo /= bar;
+    std::cout << foo << std::endl;
+}
+{
+    Fixed<2> foo(300);
+    Fixed<2> bar(0);
+
+    std::cout << "====================================================" << std::endl;
+    *reinterpret_cast<int64_t*>(&bar) = -5555;
+    std::cout << foo << '/' << bar << std::endl;
+    foo /= bar;
+    std::cout << foo << std::endl;
+
+    std::cout << "====================================================" << std::endl;
+    *reinterpret_cast<int64_t*>(&bar) = 90;
+    std::cout << foo << '/' << bar << std::endl;
+    foo /= bar;
+    std::cout << foo << std::endl;
+
+    std::cout << "====================================================" << std::endl;
+    *reinterpret_cast<int64_t*>(&bar) = -1;
+    std::cout << foo << '/' << bar << std::endl;
+    foo /= bar;
+    std::cout << foo << std::endl;
+}
+{
     Fixed<3> foo(300);
     Fixed<3> bar(0);
 
@@ -299,8 +356,8 @@ int main()
     std::cout << foo << std::endl;
 
 #define tc(u) do {\
-        Fixed<u, int64_t> foo(498765);\
-        Fixed<u, int64_t> bar(999999);\
+        Fixed<u, __int128> foo(498765);\
+        Fixed<u, __int128> bar(999999);\
         std::cout << "====================================================" << std::endl;\
         std::cout << foo << '/' << bar << std::endl;\
         foo /= bar;\
